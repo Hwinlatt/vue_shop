@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-
+import store from '@/store'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -10,11 +10,95 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/about',
     name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    component: () => import('../views/AboutView.vue')
+  },
+  {
+    path: '/shop',
+    name: 'shop',
+    component: () => import('../views/ShopView.vue'),
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/auth/LoginView.vue'),
+    beforeEnter(to, from, next) {
+      if (store.state.userToken == null || store.state.userToken == '') {
+        next();
+      }else{
+        next('home')
+      }
+    },
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('../views/auth/RegisterView.vue'),
+    beforeEnter(to, from, next) {
+      if (store.state.userToken == null || store.state.userToken == '') {
+        next();
+      }else{
+        next('home')
+      }
+    },  
+  },
+  //--------------Shops----------------
+  {
+    path: '/shop/products/:id',
+    alias:'/shop/products',
+    name: 'product',
+    component: () => import('../views/pages/ProductView.vue'),
+    beforeEnter(to, from, next) {
+      if (to.params.id) {
+        next();
+      }else{
+        next(from.fullPath)
+      }
+      
+    },
+  },
+  {
+    path: '/shopPage/:id/:name',
+    component: () => import('../views/pages/ShopPageView.vue'),
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: () => import('../views/CartView.vue'),
+    beforeEnter(to, from, next) {
+      if (store.state.userToken != null && store.state.userToken != '') {
+        next()
+      }else{
+        next('/login')
+      }
+    },
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: () => import('../views/OrderView.vue'),
+    beforeEnter(to, from, next) {
+      if (store.state.userToken == null || store.state.userToken == '') {
+        next('home')
+      }else{
+        next();
+      }
+    },
+  },
+  {
+    path: '/orders/:id',
+    name: 'orderDetail',
+    component: () => import('../views/pages/OrderDetailView.vue'),
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: () => import('../views/CheckoutView.vue'),
+  },
+  {
+    path: '/otp_confirm',
+    name: 'otpConfirm',
+    component: () => import('../views/auth/OtpInputView.vue'),
+  },
 ]
 
 const router = createRouter({
