@@ -21,7 +21,10 @@
                             </router-link>
                             <router-link v-if="!isLogin" to="/register" class="dropdown-item" type="button">Sign up
                             </router-link>
-                            <span v-if="isLogin" @click="logout()" class="dropdown-item" type="button">Logout</span>
+                            <span v-if="isLogin" @click="this.$router.push('/profile')" class="dropdown-item profileBtn"
+                                type="button"><i class="fa-solid fa-user"></i> Profile</span>
+                            <span v-if="isLogin" @click="logout()" class="dropdown-item logoutBtn" type="button"><i
+                                    class="fa-solid fa-power-off"></i> Logout</span>
                         </div>
                     </div>
                     <div class="btn-group mx-2">
@@ -146,5 +149,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.logoutBtn:hover{
+    color: red;
+}
+.profileBtn:hover{
+    color:#FFC800;
+}
 </style>

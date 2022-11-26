@@ -7,7 +7,8 @@
                     <nav class="breadcrumb bg-light mb-30">
                         <router-link to="/" class="breadcrumb-item text-dark">Home</router-link>
                         <router-link to="/shop" class="breadcrumb-item text-dark">Shop</router-link>
-                        <router-link :to="'/shopPage/'+product.user_id+'/'+product.shop_name" class="breadcrumb-item text-dark">{{ product.shop_name }}</router-link>
+                        <router-link :to="'/shopPage/' + product.user_id + '/' + product.shop_name"
+                            class="breadcrumb-item text-dark">{{ product.shop_name }}</router-link>
                         <span class="breadcrumb-item active">Product Detail </span>
                     </nav>
                 </div>
@@ -30,13 +31,12 @@
                         <h3>{{ product.name }}</h3>
                         <div class="d-flex mb-3">
                             <div class="text-primary mr-2">
-                                <small class="fas fa-star"></small>
-                                <small class="fas fa-star"></small>
-                                <small class="fas fa-star"></small>
-                                <small class="fas fa-star-half-alt"></small>
-                                <small class="far fa-star"></small>
+                                <span v-for="(index) in 5" :key="index">
+                                    <i v-if="product_rating >= index" class="fa-solid fa-star"></i>
+                                    <i v-else class="fa-regular fa-star"></i>
+                                </span>
                             </div>
-                            <small class="pt-1">(99 Reviews)</small>
+                            <small class="pt-1">({{ comment_count }} Reviews)</small>
                         </div>
                         <h3 class="font-weight-semi-bold mb-4">{{ getProductInfo('price') }} MMK</h3>
                         <p class="mb-4">Remain : {{ product.qty }}</p>
@@ -117,7 +117,9 @@
                             <a class="nav-item nav-link text-dark active" data-toggle="tab"
                                 href="#tab-pane-1">Description</a>
                             <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-2">Information</a>
-                            <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-3">Reviews (0)</a>
+                            <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-3">Reviews ({{
+                                    comment_count
+                            }})</a>
                         </div>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="tab-pane-1">
@@ -136,60 +138,64 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- ---- Review for product ---- -->
                             <div class="tab-pane fade" id="tab-pane-3">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h4 class="mb-4">1 review for "Product Name"</h4>
-                                        <div class="media mb-4">
-                                            <img src="" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
+                                        <h4 class="mb-4">{{ comment_count }} review for "Product Name"</h4>
+                                        <div class="media mb-4" v-for="(comment, index) in comments" :key="index">
+                                            <img v-if="comment.profile_photo_path"
+                                                :src="imagePath + comment.profile_photo_path" alt="Image"
+                                                class="img-fluid mr-3 mt-1" style="width: 45px;">
+                                            <img v-else :src="server + 'img/def_user.webp'" alt="Image"
+                                                class="img-fluid mr-3 mt-1" style="width: 45px;">
                                             <div class="media-body">
-                                                <h6>John Doe<small> - <i>01 Jan 2045</i></small></h6>
+                                                <h6>{{ comment.name }}<small> - <i>{{ dateFmtChg(comment.created_at)
+                                                }}</i></small>
+                                                    <button v-if="comment.user_id == userInfo.id"
+                                                        @click="cmtDelete(comment.id)"
+                                                        class="ms-5 btn btn-danger btn-sm rounded"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                                </h6>
                                                 <div class="text-primary mb-2">
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star-half-alt"></i>
-                                                    <i class="far fa-star"></i>
+                                                    <i style="cursor:pointer" @click="chgRating(index)"
+                                                        v-for="(index) in 5" :key="index" class="fa-star"
+                                                        :class="{ 'far': index >= comment.rating, 'fa-solid': index <= comment.rating }"></i>
                                                 </div>
-                                                <p>Diam amet duo labore stet elitr ea clita ipsum, tempor labore accusam
-                                                    ipsum et no at. Kasd diam tempor rebum magna dolores sed sed eirmod
-                                                    ipsum.</p>
+                                                <p>{{ comment.comment }}</p>
                                             </div>
                                         </div>
+                                        <div>
+                                            <button v-if="showMoreBtn" @click="cmtCountChg('more')"
+                                                class="btn btn-link">Show
+                                                More</button>
+                                            <button v-if="showLessBtn" @click="cmtCountChg('less')"
+                                                class="btn btn-link">Show
+                                                Less</button>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" v-if="isActive">
                                         <h4 class="mb-4">Leave a review</h4>
                                         <small>Your email address will not be published. Required fields are marked
                                             *</small>
                                         <div class="d-flex my-3">
                                             <p class="mb-0 mr-2">Your Rating * :</p>
                                             <div class="text-primary">
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
+                                                <i style="cursor:pointer" @click="chgRating(index)" v-for="(index) in 5"
+                                                    :key="index" class="fa-star"
+                                                    :class="{ 'far': index >= cmtForm.rating, 'fa-solid': index <= cmtForm.rating }"></i>
                                             </div>
                                         </div>
-                                        <form>
-                                            <div class="form-group">
-                                                <label for="message">Your Review *</label>
-                                                <textarea id="message" cols="30" rows="5"
-                                                    class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="name">Your Name *</label>
-                                                <input type="text" class="form-control" id="name">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="email">Your Email *</label>
-                                                <input type="email" class="form-control" id="email">
-                                            </div>
-                                            <div class="form-group mb-0">
-                                                <input type="submit" value="Leave Your Review"
-                                                    class="btn btn-primary px-3">
-                                            </div>
-                                        </form>
+                                        <div class="form-group">
+                                            <label for="message">Your Review *</label>
+                                            <textarea v-model="cmtForm.comment" id="message" cols="30" rows="5"
+                                                class="form-control"></textarea>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <button :disabled="cmtForm.comment.length < 1" @click="submitCmt()"
+                                                class="btn btn-primary px-3">Submit</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -227,6 +233,15 @@ export default {
                 color: '',
                 size: '',
             },
+            cmtForm: {
+                productId: this.$route.params.id,
+                comment: '',
+                rating: 5,
+            },
+            comments: [],
+            comment_count: 0,
+            cmt_limit: 5,
+            product_rating: 0,
             cartBtnLoading: false,
         }
     },
@@ -239,6 +254,7 @@ export default {
                 this.cart.color = this.getColors[0].toLowerCase();
                 this.cart.size = this.getSizes[0].toLowerCase();
             })
+            this.getComments(5);
         },
         getProductInfo(text) {
             let value = '';
@@ -328,12 +344,90 @@ export default {
                 }
             })
         },
+        chgRating(qty) {
+            this.cmtForm.rating = qty;
+        },
+        submitCmt() {
+            axios.post(this.api + '/cmt/add', this.cmtForm, this.authHeader).then(r => {
+                if (r.data.success) {
+                    this.$swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Submitted comment.',
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
+                    this.cmtForm.comment = '';
+                    this.getComments()
+                } else if (r.data.error) {
+                    let errorText = '';
+                    r.data.error.forEach(err => {
+                        errorText += err;
+                    });
+                    this.$swal.fire('Error', errorText, 'error');
+                }
+            });
+        },
+        dateFmtChg(data) {
+            let date = new Date(data);
+            let d = date.getDate();
+            let M = this.month[date.getMonth()];
+            let Y = date.getFullYear();
+            return d + '-' + M + '-' + Y;
+        },
+        getComments() {
+            axios.post(this.api + '/cmt/get/' + this.$route.params.id, { limit: this.cmt_limit }).then(r => {
+                this.comments = r.data.comments;
+                this.comment_count = r.data.comment_count;
+                this.product_rating =  Math.round(r.data.rating/this.comment_count);
+            })
+        },
+        cmtCountChg(type) {
+            if (type == 'more') {
+                this.cmt_limit += 5;
+            }
+            if (type == 'less') {
+                this.cmt_limit -= 5;
+
+            }
+            this.getComments()
+        },
+        cmtDelete(id) {
+            this.$swal.fire({
+                title: 'Are you sure to Delete this comment?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                axios.post(this.api + '/cmt/delete/' + id, {}, this.authHeader).then(r => {
+                    if (r.data.success) {
+                        if (result.isConfirmed) {
+                            this.getComments();
+                            this.$swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Comment Deleted.',
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    }
+                    if (r.data.error) {
+                        this.$swal.fire('Error', r.data.error, 'error');
+                    }
+                })
+
+            })
+        }
 
 
     },
     computed: {
-        ...mapState(['api', 'imagePath', 'userInfo', 'userToken']),
-        ...mapGetters(['authHeader']),
+        ...mapState(['api', 'imagePath', 'userInfo', 'userToken', 'server', 'month']),
+        ...mapGetters(['authHeader', 'isActive']),
         getColors() {
             let colors = this.getProductInfo('color').split(',');
             return colors;
@@ -341,6 +435,18 @@ export default {
         getSizes() {
             let colors = this.getProductInfo('size').split(',');
             return colors;
+        },
+        showMoreBtn() {
+            if (this.comments.length < this.comment_count) {
+                return true;
+            }
+            return false;
+        },
+        showLessBtn() {
+            if (this.cmt_limit > 5) {
+                return true;
+            }
+            return false
         }
     },
     beforeMount() {

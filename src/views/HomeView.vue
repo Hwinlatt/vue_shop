@@ -8,7 +8,8 @@
   export default {
     name:'HomeView',
     mounted () {
-      this.$store.state.activePage = 'home';
+      // this.$store.state.activePage = 'home';
+      this.$router.push('/shop')
     },
   }
 </script>

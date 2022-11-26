@@ -5,8 +5,9 @@ export default createStore({
   state: {
     activePage: '',
     userToken: localStorage.getItem('token'),
-    api: 'http://127.0.0.1:8000/api',
-    imagePath: 'http://127.0.0.1:8000/images/',
+    api: 'http://hellolinkermail-001-site1.itempurl.com/api',
+    server:'http://hellolinkermail-001-site1.itempurl.com/',
+    imagePath: 'http://hellolinkermail-001-site1.itempurl.com/images/',
     month: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     userInfo: {
       name: 'My Account',
@@ -42,6 +43,7 @@ export default createStore({
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer ' + state.userToken,
+          'Content-Type': 'multipart/form-data'
         }
       }
     },
@@ -57,7 +59,6 @@ export default createStore({
   },
   actions: {
     getUserData({ state, getters }) {
-      console.log(getters.authHeader);
       if (getters.isLogin) {
         axios.get(state.api + '/user', getters.authHeader).then(r => {
           state.userInfo = r.data;

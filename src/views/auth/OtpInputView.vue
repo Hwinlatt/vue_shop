@@ -9,7 +9,7 @@
                     <span class="">Getting User Data</span>
                 </div>
                 <div v-if="!isLoading" class="card">
-                    <small class="m-1">Otp Code is sent to {{ formData.email }}</small>
+                    <small v-if="state==2" class="m-1">Otp Code is sent to {{ formData.email }}</small>
                     <div class="card-header"><span>Enter Email</span> <span>Enter OTP Code</span></div>
                     <div class="card-body">
                         <div v-if="state == 1">

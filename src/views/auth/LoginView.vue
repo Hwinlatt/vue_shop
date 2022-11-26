@@ -22,7 +22,7 @@
                         <div class="row mb-3">
                             <label for="password" class="col-md-4 col-form-label text-md-end">Password</label>
                             <div class="col-md-6">
-                                <input id="password" :class="error.password ? 'is-invalid' : ''"
+                                <input @keypress.enter="loginProcess()" id="password" :class="error.password ? 'is-invalid' : ''"
                                     placeholder="Enter password" v-model="formData.password" type="password"
                                     class="form-control" autocomplete="none">
                                 <div class="invalid-feedback">
